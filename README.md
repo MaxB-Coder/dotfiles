@@ -81,7 +81,6 @@ dotfiles/
 │   └── wezterm.lua
 ├── install.sh
 ├── README.md
-└── WINDOWS.md
 ```
 
 ---
