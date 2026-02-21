@@ -38,8 +38,12 @@ config.window_frame = {
 config.send_composed_key_when_left_alt_is_pressed = false
 config.use_ime = false
 
--- Shell
-config.default_prog = { "/bin/zsh", "-l" }
+-- Shell (OS aware)
+if wezterm.target_triple == "x86_64-pc-windows-msvc" then
+  config.default_prog = { "wsl.exe", "--distribution", "Ubuntu" }
+else
+  config.default_prog = { "/bin/zsh", "-l" }
+end
 
 -- Scrollback
 config.scrollback_lines = 10000
