@@ -16,6 +16,7 @@ Personal development environment configuration for Mac and Windows (WSL).
 ### Prerequisites
 - macOS
 - Homebrew — if not installed, the install script will install it
+- A GitHub account with an SSH key configured
 
 ### Quick Install
 ```bash
@@ -51,7 +52,7 @@ Then open Neovim and run `:Lazy` to install plugins.
 
 ### Prerequisites
 - Windows 10 or 11
-- A GitHub account with an SSH key configured
+- A GitHub account
 
 ### Step 1: Install WSL
 
@@ -60,8 +61,12 @@ Open PowerShell as Administrator and run:
 wsl --install
 ```
 
-This installs WSL2 and Ubuntu by default. Restart your machine when prompted.
-Once restarted, Ubuntu will open and ask you to create a username and password.
+Restart your machine when prompted. You may need to restart twice — once to enable the Windows features, and once after Ubuntu installs. When Ubuntu opens, create a username and password.
+
+If Ubuntu doesn't launch automatically after restarting, run:
+```powershell
+wsl --install -d Ubuntu
+```
 
 Verify WSL is working:
 ```powershell
@@ -77,23 +82,26 @@ https://wezfurlong.org/wezterm/installation.html
 
 Choose the Windows installer (.exe).
 
-### Step 3: Install JetBrains Mono Font
+### Step 3: Pull WezTerm config from GitHub
 
-Download from:
-https://www.jetbrains.com/legalnotice/fonts/
-
-Install all font files by selecting them all, right clicking and choosing "Install for all users".
-
-### Step 4: Configure WezTerm to use WSL
-
-Open WezTerm's config at `C:\Users\USERNAME\.config\wezterm\wezterm.lua` and update the `default_prog` line to:
-```lua
-config.default_prog = { "wsl.exe", "--distribution", "Ubuntu" }
+In Command Prompt run:
+```cmd
+mkdir %USERPROFILE%\.config\wezterm
+curl -o %USERPROFILE%\.config\wezterm\wezterm.lua https://raw.githubusercontent.com/MaxB-Coder/dotfiles/main/wezterm/wezterm.lua
 ```
 
-### Step 5: Clone dotfiles inside WSL
+The config automatically detects Windows and points WezTerm at WSL. Restart WezTerm — it should now open Ubuntu.
 
-Open WezTerm (it should now open Ubuntu via WSL) and run:
+### Step 4: Install JetBrains Mono Font
+
+Download from:
+https://www.jetbrains.com/fonts/
+
+Extract the zip, select all `.ttf` files (ignore webfonts folder), right click and choose **Install for all users**.
+
+### Step 5: Set up SSH and clone dotfiles
+
+Inside WezTerm (now running Ubuntu) run:
 ```bash
 sudo apt-get update
 sudo apt-get install -y git
@@ -104,8 +112,9 @@ cat ~/.ssh/id_ed25519.pub
 
 Copy the output and add it to GitHub under Settings → SSH Keys → New SSH Key.
 
-Then clone your dotfiles:
+**Important:** make sure you are in your Linux home directory before cloning to avoid Windows filesystem performance issues:
 ```bash
+cd ~
 git clone git@github.com:MaxB-Coder/dotfiles.git ~/dotfiles
 ```
 
@@ -124,7 +133,24 @@ chmod +x install.sh
 ./install.sh
 ```
 
-### Step 8: Install Neovim plugins
+### Step 8: Install NVM and Node
+
+Mason requires Node for several language servers:
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+```
+
+Close and reopen WezTerm, then:
+```bash
+nvm install --lts
+```
+
+### Step 9: Install additional dependencies
+```bash
+sudo apt-get install -y unzip python3-pip
+```
+
+### Step 10: Install Neovim plugins
 ```bash
 nvim
 ```
@@ -132,7 +158,7 @@ nvim
 Lazy will automatically install all plugins on first launch.
 Wait for it to complete, then press `q` to close the Lazy window.
 
-### Step 9: Verify everything is working
+### Step 11: Verify everything is working
 ```bash
 echo $SHELL        # should return /bin/zsh
 echo $EDITOR       # should return nvim
@@ -141,30 +167,33 @@ nvim               # should open with Claude theme and dashboard
 
 ### Notes
 
-- WezTerm config is shared between Mac and Windows via dotfiles,
-  but the `default_prog` line needs to differ per OS — the wezterm.lua
-  already handles this with the OS detection block.
+- WezTerm config is shared between Mac and Windows via dotfiles. The `wezterm.lua` uses OS detection to automatically set the correct shell — no manual editing needed.
+- `plugins.zsh` uses OS detection to source zsh plugins from the correct path on Mac (Homebrew) and Linux (apt).
+- Always clone and work inside the Linux filesystem (`~/`) not the Windows filesystem (`/mnt/c/...`) for best performance.
 - Windows gaming runs natively and is completely unaffected by WSL.
 - To update your dotfiles on either machine: `cd ~/dotfiles && git pull`
 
 ### Troubleshooting
 
+**Ubuntu doesn't launch after restart:**
+Open PowerShell and run `wsl --install -d Ubuntu`.
+
 **Starship not showing correctly:**
-Make sure JetBrains Mono is set as the font in WezTerm settings.
+Make sure JetBrains Mono is installed on Windows and set as the font in WezTerm.
 
 **Neovim plugins not installing:**
-Make sure you have an internet connection inside WSL:
-```bash
-ping google.com
-```
-If this fails, restart WSL: `wsl --shutdown` in PowerShell, then reopen WezTerm.
+Make sure Node is in PATH: `node --version`. If not found, install NVM and run `nvm install --lts`.
+
+**Neovim plugins not installing (network):**
+Check internet inside WSL: `ping google.com`.
+If this fails, restart WSL: run `wsl --shutdown` in PowerShell, then reopen WezTerm.
 
 **zsh not loading .zshrc:**
-Make sure the symlink exists:
-```bash
-ls -la ~/.zshrc
-```
+Make sure the symlink exists: `ls -la ~/.zshrc`
 It should point to `~/dotfiles/zsh/.zshrc`.
+
+**Language servers not working:**
+Open Neovim and run `:Mason` to check server status. Most issues resolve once Node and pip are installed.
 
 ---
 
