@@ -1,5 +1,13 @@
-# zsh-autosuggestions: suggests commands as you type based on history
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+# zsh-autosuggestions
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+else
+  source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
 
-# zsh-syntax-highlighting: highlights valid commands in green, invalid in red
-source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# zsh-syntax-highlighting
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+else
+  source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
