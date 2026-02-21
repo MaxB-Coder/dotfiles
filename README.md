@@ -16,7 +16,6 @@ Personal development environment configuration for Mac and Windows (WSL).
 ### Prerequisites
 - macOS
 - Homebrew — if not installed, the install script will install it
-- A GitHub account with an SSH key configured
 
 ### Quick Install
 ```bash
