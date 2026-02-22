@@ -72,6 +72,15 @@ elif [[ "$OS" == "linux" ]]; then
   curl -sS https://starship.rs/install.sh | sh
   # zsh plugins
   sudo apt-get install -y zsh-autosuggestions zsh-syntax-highlighting
+  # Symlink system treesitter parsers
+  info "Linking treesitter parsers..."
+  mkdir -p "$HOME/.local/share/nvim/site/parser"
+  if ls /usr/lib/x86_64-linux-gnu/nvim/parser/*.so 2>/dev/null; then
+    ln -sf /usr/lib/x86_64-linux-gnu/nvim/parser/*.so "$HOME/.local/share/nvim/site/parser/"
+    success "Treesitter parsers linked"
+  else
+    info "No system treesitter parsers found, skipping"
+  fi
 fi
 
 success "Packages installed"
