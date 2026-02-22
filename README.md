@@ -97,7 +97,7 @@ The config automatically detects Windows and points WezTerm at WSL. Restart WezT
 Download from:
 https://www.jetbrains.com/fonts/
 
-Extract the zip, select all `.ttf` files (ignore webfonts folder), right click and choose **Install for all users**.
+Extract the zip, select all `.ttf` files (ignore the webfonts folder), right click and choose **Install for all users**.
 
 ### Step 5: Set up SSH and clone dotfiles
 
@@ -155,8 +155,7 @@ sudo apt-get install -y unzip python3-pip
 nvim
 ```
 
-Lazy will automatically install all plugins on first launch.
-Wait for it to complete, then press `q` to close the Lazy window.
+Lazy will automatically install all plugins on first launch including Treesitter parsers for all configured languages. Wait for it to complete, then press `q` to close the Lazy window.
 
 ### Step 11: Verify everything is working
 ```bash
@@ -194,6 +193,9 @@ It should point to `~/dotfiles/zsh/.zshrc`.
 
 **Language servers not working:**
 Open Neovim and run `:Mason` to check server status. Most issues resolve once Node and pip are installed.
+
+**Treesitter highlighting not working:**
+Make sure the plugin is using `branch = "master"` — the `main` branch has an incompatible API and does not include highlight queries.
 
 ---
 

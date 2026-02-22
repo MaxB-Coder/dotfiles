@@ -8,7 +8,8 @@ M.colors = {
   fg          = "#e0e0e0",
   fg_dim      = "#A8A8A8",    -- exact Starship grey
   comment     = "#6b6b6b",
-  orange      = "#E07B39",    -- exact Starship orange
+  orange      = "#E07B39",
+  purple      = "#9B7EC8",
   amber       = "#C8A97E",    -- exact Starship amber
   red         = "#CC4A32",    -- exact Starship error red
   green       = "#7DAF75",
@@ -74,27 +75,33 @@ function M.setup()
   hl(0, "WarningMsg",      { fg = c.orange })
   hl(0, "ErrorMsg",        { fg = c.red })
 
-  -- Treesitter
-  hl(0, "@comment",        { fg = c.comment, italic = true })
-  hl(0, "@string",         { fg = c.amber })
-  hl(0, "@number",         { fg = c.amber })
-  hl(0, "@boolean",        { fg = c.orange })
-  hl(0, "@keyword",        { fg = c.orange, bold = true })
-  hl(0, "@keyword.return", { fg = c.orange, bold = true })
-  hl(0, "@function",       { fg = c.amber })
-  hl(0, "@function.call",  { fg = c.amber })
-  hl(0, "@method",         { fg = c.amber })
-  hl(0, "@method.call",    { fg = c.amber })
-  hl(0, "@variable",       { fg = c.fg })
-  hl(0, "@parameter",      { fg = c.fg_dim })
-  hl(0, "@type",           { fg = c.amber })
-  hl(0, "@constant",       { fg = c.orange })
-  hl(0, "@operator",       { fg = c.fg_dim })
-  hl(0, "@punctuation",    { fg = c.fg_dim })
-  hl(0, "@property",       { fg = c.fg })
-  hl(0, "@field",          { fg = c.fg })
-  hl(0, "@tag",            { fg = c.orange })
-  hl(0, "@tag.attribute",  { fg = c.amber })
+-- Treesitter
+  hl(0, "@keyword",            { fg = c.orange, bold = true })
+  hl(0, "@keyword.function",   { fg = c.orange, bold = true })
+  hl(0, "@keyword.return",     { fg = c.orange, bold = true })
+  hl(0, "@string",             { fg = c.green })
+  hl(0, "@string.escape",      { fg = c.amber })
+  hl(0, "@function",           { fg = c.amber, bold = true })
+  hl(0, "@function.call",      { fg = c.amber })
+  hl(0, "@method",             { fg = c.amber })
+  hl(0, "@method.call",        { fg = c.amber })
+  hl(0, "@type",               { fg = "#9B7EC8", bold = true })
+  hl(0, "@type.builtin",       { fg = "#9B7EC8" })
+  hl(0, "@constructor",        { fg = "#9B7EC8" })
+  hl(0, "@parameter",          { fg = c.fg })
+  hl(0, "@variable",           { fg = c.fg })
+  hl(0, "@variable.builtin",   { fg = c.orange })
+  hl(0, "@constant",           { fg = c.orange })
+  hl(0, "@constant.builtin",   { fg = c.orange })
+  hl(0, "@property",           { fg = c.fg_dim })
+  hl(0, "@field",              { fg = c.fg_dim })
+  hl(0, "@number",             { fg = "#9B7EC8" })
+  hl(0, "@boolean",            { fg = c.orange, bold = true })
+  hl(0, "@comment",            { fg = c.comment, italic = true })
+  hl(0, "@tag",                { fg = c.orange })
+  hl(0, "@tag.attribute",      { fg = c.amber })
+  hl(0, "@punctuation",        { fg = c.fg_dim })
+  hl(0, "@operator",           { fg = c.fg_dim })
 
   -- LSP
   hl(0, "DiagnosticError",       { fg = c.red })
