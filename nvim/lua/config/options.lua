@@ -54,3 +54,13 @@ vim.g.clipboard = {
 
 vim.opt.list = true
 vim.opt.listchars = { trail = "·", tab = "» ", nbsp = "␣" }
+
+-- Syntax colour overrides
+local function my_highlights()
+  vim.api.nvim_set_hl(0, "@tag", { fg = "#E07B39" })
+  vim.api.nvim_set_hl(0, "@string", { fg = "#A3A9CE" })
+  vim.api.nvim_set_hl(0, "RainbowDelimiterRed", { fg = "#A8A8A8" })
+end
+
+my_highlights()
+vim.api.nvim_create_autocmd("ColorScheme", { callback = my_highlights })
