@@ -10,6 +10,8 @@ return {
           "lua", "javascript", "typescript",
           "java", "python", "bash", "json",
           "yaml", "markdown", "html", "css",
+          "htmldjango", "go", "gomod", "gosum", "gotmpl",
+          "sql", "toml", "dockerfile",
         },
         highlight = { enable = true },
         indent = { enable = true },

@@ -21,6 +21,7 @@ return {
           "cssls",
           "html",
           "jdtls",      -- Java
+          "gopls",
         },
         automatic_installation = true,
       })
@@ -49,9 +50,18 @@ return {
       })
 
       -- All servers except jdtls (it needs special handling)
-      local servers = { "lua_ls", "ts_ls", "pyright", "bashls", "cssls", "html" }
-      for _, server in ipairs(servers) do
-        vim.lsp.config(server, { capabilities = capabilities })
+      local servers = {
+        lua_ls = {},
+        ts_ls = {},
+        pyright = {},
+        bashls = {},
+        cssls = {},
+        html = { filetypes = { "html", "templ", "htmldjango" } },
+        gopls = {},
+      }
+      for server, opts in pairs(servers) do
+        opts.capabilities = capabilities
+        vim.lsp.config(server, opts)
         vim.lsp.enable(server)
       end
     end,
