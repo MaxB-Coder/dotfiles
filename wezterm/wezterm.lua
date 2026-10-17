@@ -35,7 +35,7 @@ config.window_frame = {
 }
 
 -- Performance
-config.send_composed_key_when_left_alt_is_pressed = false
+config.send_composed_key_when_left_alt_is_pressed = true
 config.use_ime = false
 
 -- Shell (OS aware)

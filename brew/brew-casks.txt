@@ -1,0 +1,8 @@
+aionui
+android-platform-tools
+cxpatcher
+font-jetbrains-mono
+gstreamer-runtime
+iterm2
+vlc
+wezterm
