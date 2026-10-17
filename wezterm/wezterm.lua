@@ -72,6 +72,9 @@ end
 config.initial_cols = 220
 config.initial_rows = 50
 
+-- Close the window or quit straight away, no "really close?" prompt
+config.window_close_confirmation = "NeverPrompt"
+
 -- Tab bar
 config.use_fancy_tab_bar = true
 config.tab_bar_at_bottom = false
@@ -197,12 +200,35 @@ wezterm.on("update-status", function(window, pane)
   window:set_left_status(wezterm.format({ { Background = { Color = palette.bar } }, { Text = gap } }))
 end)
 
+-- Rename the current tab; an empty name goes back to the automatic title
+local rename_tab = act.PromptInputLine({
+  description = wezterm.format({
+    { Foreground = { Color = palette.accent } },
+    { Text = "Rename tab" },
+    { Foreground = { Color = palette.muted } },
+    { Text = "  (leave empty for automatic name)" },
+  }),
+  action = wezterm.action_callback(function(window, pane, line)
+    if line then
+      window:active_tab():set_title(line)
+    end
+  end),
+})
+
+wezterm.on("augment-command-palette", function(window, pane)
+  return {
+    { brief = "Rename tab", icon = "md_rename_box", action = rename_tab },
+  }
+end)
+
 -- Key bindings: CMD on macOS, CTRL+SHIFT on Windows (Win+key belongs to the OS)
 local mod = is_windows and "CTRL|SHIFT" or "CMD"
+local rename_mods = is_windows and "CTRL|SHIFT" or "CMD|SHIFT"
 
 config.keys = {
   -- Tabs
   { key = "t", mods = mod, action = act.SpawnTab("CurrentPaneDomain") },
+  { key = "r", mods = rename_mods, action = rename_tab },
   { key = "w", mods = mod, action = act.CloseCurrentTab({ confirm = false }) },
   { key = "1", mods = mod, action = act.ActivateTab(0) },
   { key = "2", mods = mod, action = act.ActivateTab(1) },
