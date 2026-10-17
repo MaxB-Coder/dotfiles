@@ -10,10 +10,11 @@ export NVM_DIR="$HOME/.nvm"
 export PATH="$HOME/.dotnet/tools:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 
-# Google Cloud SDK
-if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then
-  source "$HOME/google-cloud-sdk/path.zsh.inc"
+# Google Cloud SDK (Homebrew cask: gcloud-cli)
+GCLOUD_SDK="${HOMEBREW_PREFIX:-/opt/homebrew}/share/google-cloud-sdk"
+if [ -f "$GCLOUD_SDK/path.zsh.inc" ]; then
+  source "$GCLOUD_SDK/path.zsh.inc"
 fi
-if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then
-  source "$HOME/google-cloud-sdk/completion.zsh.inc"
+if [ -f "$GCLOUD_SDK/completion.zsh.inc" ]; then
+  source "$GCLOUD_SDK/completion.zsh.inc"
 fi
