@@ -1,20 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#3a3a3a"/>
-      <stop offset="100%" stop-color="#1a1a1a"/>
-    </linearGradient>
-  </defs>
-  <!-- macOS icon grid: 412px body centered on 512 canvas (= 824 on 1024) -->
-  <g transform="translate(50 50) scale(0.8046875)">
-    <!-- Background -->
-    <rect width="512" height="512" rx="100" fill="url(#bg)"/>
-    <!-- Prompt symbol -->
-    <text x="256" y="340"
-      font-family="JetBrains Mono, monospace"
-      font-size="280"
-      font-weight="bold"
-      fill="#E07B39"
-      text-anchor="middle">❯</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Nerd Font "dev_terminal" glyph (U+E795), outline copied from the font, fitted to 720px wide
+       (a bit under the 824px macOS grid so it sits level with other Dock icons) -->
+  <g transform="translate(152.00 202.66) scale(0.487145 -0.487145) translate(81 -1344)">
+    <path d="M1293 1344H24Q-20 1344 -50.5 1313.0Q-81 1282 -81 1237V181Q-81 136 -50.5 105.0Q-20 74 24 74H1293Q1336 74 1366.5 105.0Q1397 136 1397 181V1237Q1397 1282 1366.5 1313.0Q1336 1344 1293 1344Z" fill="#e07b39"/>
+    <!-- >_ shifted so it sits in the centre of the box (glyph has it low-left) -->
+    <path transform="translate(105 -105.5)" d="M130 604 342 814 130 1025 235 1132 553 814 235 497 130 604ZM976 497H553V604H976V497Z" fill="#1d2021"/>
   </g>
 </svg>

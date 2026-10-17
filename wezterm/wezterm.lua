@@ -1,7 +1,6 @@
 local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 local act = wezterm.action
-local nf = wezterm.nerdfonts
 
 local is_windows = wezterm.target_triple:find("windows") ~= nil
 local is_mac = wezterm.target_triple:find("darwin") ~= nil
@@ -22,6 +21,9 @@ local palette = {
 config.color_scheme = "Gruvbox Dark (Gogh)"
 config.font = wezterm.font("JetBrains Mono")
 config.font_size = 14.0
+-- Also sets the retro tab bar height: 1.3 rows (~24pt) fits the macOS
+-- window buttons while keeping prompt pills slim
+config.line_height = 1.3
 config.adjust_window_size_when_changing_font_size = false
 config.max_fps = 120
 
@@ -36,7 +38,6 @@ config.colors = {
     active_tab = { bg_color = palette.bg, fg_color = palette.fg, intensity = "Bold" },
     inactive_tab = { bg_color = palette.bar, fg_color = palette.muted },
     inactive_tab_hover = { bg_color = palette.bg1, fg_color = palette.fg_dim },
-    inactive_tab_edge = palette.bg1,
     new_tab = { bg_color = palette.bar, fg_color = palette.muted },
     new_tab_hover = { bg_color = palette.bg1, fg_color = palette.fg },
   },
@@ -76,14 +77,13 @@ config.initial_rows = 50
 config.window_close_confirmation = "NeverPrompt"
 
 -- Tab bar
-config.use_fancy_tab_bar = true
+config.use_fancy_tab_bar = false
+config.tab_max_width = 32
 config.tab_bar_at_bottom = false
 config.hide_tab_bar_if_only_one_tab = false -- the bar holds the window buttons
 config.show_tabs_in_tab_bar = true
 config.show_new_tab_button_in_tab_bar = true
 config.window_frame = {
-  font = wezterm.font({ family = "JetBrains Mono", weight = "DemiBold" }),
-  font_size = 12.0,
   active_titlebar_bg = palette.bar,
   inactive_titlebar_bg = palette.bar,
   active_titlebar_fg = palette.fg,
@@ -110,28 +110,12 @@ end
 -- Scrollback
 config.scrollback_lines = 10000
 
--- Tab titles: process icon + folder (in a shell) or program name, centred
+-- Tab titles: folder (in a shell) or program name, centred
 local TAB_WIDTH = 24
 
 local shells = {
   zsh = true, bash = true, fish = true, sh = true, nu = true,
   pwsh = true, powershell = true, cmd = true,
-}
-
-local process_icons = {
-  nvim = nf.custom_neovim,
-  vim = nf.custom_vim,
-  git = nf.dev_git,
-  lazygit = nf.dev_git,
-  node = nf.dev_nodejs_small,
-  bun = nf.dev_nodejs_small,
-  python = nf.dev_python,
-  python3 = nf.dev_python,
-  cargo = nf.dev_rust,
-  go = nf.seti_go,
-  docker = nf.linux_docker,
-  ssh = nf.md_ssh,
-  lua = nf.md_language_lua,
 }
 
 local function basename(path)
@@ -155,48 +139,41 @@ local function tab_label(tab)
   local pane = tab.active_pane
   local process = basename(pane.foreground_process_name):gsub("%.exe$", "")
   if tab.tab_title and #tab.tab_title > 0 then
-    return tab.tab_title, process
+    return tab.tab_title
   end
   -- WSL hides the real process; the shell title is the best signal
   if process == "wsl" or process == "wslhost" then
-    return pane.title, process
+    return pane.title
   end
   if process == "" or shells[process] then
-    return cwd_label(pane) or pane.title, process
+    return cwd_label(pane) or pane.title
   end
-  return process, process
+  return process
 end
 
 wezterm.on("format-tab-title", function(tab, tabs, panes, cfg, hover, max_width)
-  local label, process = tab_label(tab)
-  local icon = process_icons[process] or nf.dev_terminal
+  local label = wezterm.truncate_right(tab_label(tab), TAB_WIDTH - 4)
+  local width = wezterm.column_width(label)
+  local left = math.max(0, math.floor((TAB_WIDTH - width) / 2))
+  local right = math.max(0, TAB_WIDTH - width - left)
 
-  label = wezterm.truncate_right(label, TAB_WIDTH - 6)
-  local content_width = wezterm.column_width(icon .. "  " .. label)
-  local left = math.max(0, math.floor((TAB_WIDTH - content_width) / 2))
-  local right = math.max(0, TAB_WIDTH - content_width - left)
-
-  local icon_color = palette.muted
-  local label_color = palette.muted
+  local color = palette.muted
   if tab.is_active then
-    icon_color, label_color = palette.accent, palette.fg
+    color = palette.fg
   elseif hover then
-    icon_color, label_color = palette.fg_dim, palette.fg_dim
+    color = palette.fg_dim
   end
 
   return {
-    { Text = string.rep(" ", left) },
-    { Foreground = { Color = icon_color } },
-    { Text = icon .. "  " },
-    { Foreground = { Color = label_color } },
-    { Text = label },
-    { Text = string.rep(" ", right) },
+    { Attribute = { Intensity = tab.is_active and "Bold" or "Normal" } },
+    { Foreground = { Color = color } },
+    { Text = string.rep(" ", left) .. label .. string.rep(" ", right) },
   }
 end)
 
 -- Gap between the macOS window buttons and the first tab
 wezterm.on("update-status", function(window, pane)
-  local gap = is_mac and "  " or ""
+  local gap = is_mac and " " or ""
   window:set_left_status(wezterm.format({ { Background = { Color = palette.bar } }, { Text = gap } }))
 end)
 

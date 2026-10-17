@@ -6,6 +6,35 @@ source ~/dotfiles/zsh/plugins.zsh
 # Starship prompt (must be at the end)
 eval "$(starship init zsh)"
 
+# Transient prompt: once a command runs, its prompt collapses to "❯ command"
+# so scrollback stays clean and only the live prompt shows the pills
+zle-line-init() {
+  emulate -L zsh
+  [[ $CONTEXT == start ]] || return 0
+
+  while true; do
+    zle .recursive-edit
+    local -i ret=$?
+    [[ $ret == 0 && $KEYS == $'\4' ]] || break # Ctrl-D on an empty line
+    [[ -o ignore_eof ]] || exit 0
+  done
+
+  local saved_prompt=$PROMPT saved_rprompt=$RPROMPT
+  PROMPT='%B%F{#e07b39}❯%f%b '
+  RPROMPT=''
+  zle .reset-prompt
+  PROMPT=$saved_prompt
+  RPROMPT=$saved_rprompt
+
+  if (( ret )); then
+    zle .send-break
+  else
+    zle .accept-line
+  fi
+  return ret
+}
+zle -N zle-line-init
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
