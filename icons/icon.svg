@@ -5,13 +5,16 @@
       <stop offset="100%" stop-color="#1a1a1a"/>
     </linearGradient>
   </defs>
-  <!-- Background -->
-  <rect width="512" height="512" rx="100" fill="url(#bg)"/>
-  <!-- Prompt symbol -->
-  <text x="256" y="340"
-    font-family="JetBrains Mono, monospace"
-    font-size="280"
-    font-weight="bold"
-    fill="#E07B39"
-    text-anchor="middle">❯</text>
+  <!-- macOS icon grid: 412px body centered on 512 canvas (= 824 on 1024) -->
+  <g transform="translate(50 50) scale(0.8046875)">
+    <!-- Background -->
+    <rect width="512" height="512" rx="100" fill="url(#bg)"/>
+    <!-- Prompt symbol -->
+    <text x="256" y="340"
+      font-family="JetBrains Mono, monospace"
+      font-size="280"
+      font-weight="bold"
+      fill="#E07B39"
+      text-anchor="middle">❯</text>
+  </g>
 </svg>
