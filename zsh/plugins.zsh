@@ -1,16 +1,13 @@
-# zsh-autosuggestions
+# Plugin location: Homebrew on macOS, apt on Linux/WSL
+# ($HOMEBREW_PREFIX instead of `brew --prefix`, which spawns a process)
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+  ZSH_PLUGIN_DIR="$HOMEBREW_PREFIX/share"
 else
-  source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+  ZSH_PLUGIN_DIR="/usr/share"
 fi
 
-# zsh-syntax-highlighting
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-else
-  source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
+source "$ZSH_PLUGIN_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh"
+source "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
 # Gruvbox colours for what you type (matches the WezTerm theme)
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#665c54"

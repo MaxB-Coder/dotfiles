@@ -1,4 +1,5 @@
 # Pill prompt: folder in an orange pill, git in a dark pill, input below.
+# Pill text uses "blink" so WezTerm draws it smaller (see font_rules there).
 # Glyphs are Nerd Font escapes: \ue0b6 / \ue0b4 = round pill caps, \ue0a0 = branch
 format = """
 $directory\
@@ -10,21 +11,21 @@ $character"""
 
 # Directory (Claude orange pill)
 [directory]
-style = "bold fg:#1d2021 bg:#e07b39"
+style = "bold blink fg:#1d2021 bg:#e07b39"
 format = "[\ue0b6](fg:#e07b39)[ $path]($style)[$read_only]($read_only_style)[ ]($style)[\ue0b4](fg:#e07b39) "
 read_only = " \uf023"
-read_only_style = "fg:#1d2021 bg:#e07b39"
+read_only_style = "blink fg:#1d2021 bg:#e07b39"
 truncation_length = 3
 truncate_to_repo = true
 
 # Git branch + status share one dark pill: branch opens it, status closes it
 [git_branch]
 symbol = "\ue0a0 "
-style = "bold fg:#d5c4a1 bg:#3c3836"
+style = "bold blink fg:#d5c4a1 bg:#3c3836"
 format = "[\ue0b6](fg:#3c3836)[ $symbol$branch]($style)"
 
 [git_status]
-style = "bold fg:#e07b39 bg:#3c3836"
+style = "bold blink fg:#e07b39 bg:#3c3836"
 format = "([ $all_status$ahead_behind]($style))[ ](bg:#3c3836)[\ue0b4](fg:#3c3836) "
 
 # Command duration (quiet grey after the pills)
@@ -35,4 +36,4 @@ format = "[$duration](#928374) "
 # Prompt character
 [character]
 success_symbol = "[❯](bold #e07b39)"   # Claude orange
-error_symbol = "[❯](bold #cc4a32)"     # deeper red for errors
+error_symbol = "[❯](bold #fb4934)"     # palette red for errors

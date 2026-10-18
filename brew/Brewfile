@@ -1,0 +1,24 @@
+# Everything the dotfiles need on macOS. install.sh runs:
+#   brew bundle --file=~/dotfiles/brew/Brewfile
+# (brew/Brewfile.all is a snapshot of everything installed on the main Mac)
+
+# Core
+brew "git"
+brew "neovim"
+brew "starship"
+brew "mise"             # Node, Go and other runtimes (see mise/config.toml)
+brew "tree-sitter-cli"  # builds Neovim's Treesitter parsers
+brew "ripgrep"
+
+# Shell
+brew "zsh-autosuggestions"
+brew "zsh-syntax-highlighting"
+brew "fzf"
+brew "eza"
+brew "bat"
+brew "git-delta"
+brew "zoxide"
+
+# Apps and fonts
+cask "wezterm"
+cask "font-jetbrains-mono"

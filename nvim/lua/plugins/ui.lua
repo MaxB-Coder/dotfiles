@@ -4,27 +4,31 @@ return {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
+      local p = require("palette")
       require("lualine").setup({
         options = {
           theme = {
             normal = {
-              a = { fg = "#1a1a1a", bg = "#E07B39", bold = true },
-              b = { fg = "#e0e0e0", bg = "#2a2a2a" },
-              c = { fg = "#A8A8A8", bg = "#1a1a1a" },
+              a = { fg = p.bar, bg = p.accent, bold = true },
+              b = { fg = p.fg, bg = p.bg1 },
+              c = { fg = p.fg4, bg = p.bar },
             },
             insert = {
-              a = { fg = "#1a1a1a", bg = "#C8A97E", bold = true },
+              a = { fg = p.bar, bg = p.yellow_dim, bold = true },
             },
             visual = {
-              a = { fg = "#1a1a1a", bg = "#C8A97E", bold = true },
+              a = { fg = p.bar, bg = p.purple, bold = true },
             },
             replace = {
-              a = { fg = "#1a1a1a", bg = "#CC4A32", bold = true },
+              a = { fg = p.bar, bg = p.red, bold = true },
             },
             inactive = {
-              c = { fg = "#6b6b6b", bg = "#1a1a1a" },
+              c = { fg = p.muted, bg = p.bar },
             },
           },
+          -- Rounded ends to match the prompt pills
+          section_separators = { left = "\u{e0b4}", right = "\u{e0b6}" },
+          component_separators = { left = "", right = "" },
         },
       })
     end,

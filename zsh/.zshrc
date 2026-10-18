@@ -1,9 +1,36 @@
-# Load all zsh config files
+# No duplicate PATH entries, however many shells nest
+typeset -U path PATH
+
+# History: large, shared live between tabs, no duplicates
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+setopt extended_history share_history hist_ignore_all_dups hist_ignore_space hist_reduce_blanks
+
+# Completion: Homebrew's completions on macOS, and a cached compinit that only
+# rebuilds its dump once a day (an uncached compinit costs ~50ms per shell)
+typeset -U fpath
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  fpath=("${HOMEBREW_PREFIX:-/opt/homebrew}/share/zsh/site-functions" $fpath)
+fi
+autoload -Uz compinit
+() {
+  setopt local_options extended_glob
+  local dump="${ZDOTDIR:-$HOME}/.zcompdump"
+  if [[ -f "$dump" && -z $dump(#qN.mh+24) ]]; then
+    compinit -C -d "$dump"
+  else
+    compinit -d "$dump"
+  fi
+}
+
+# Load all zsh config files (mise, Bun, Java and PATH live in exports.zsh)
 source ~/dotfiles/zsh/exports.zsh
 source ~/dotfiles/zsh/aliases.zsh
+source ~/dotfiles/zsh/tools.zsh   # before plugins, so syntax highlighting sees fzf's widgets
 source ~/dotfiles/zsh/plugins.zsh
 
-# Starship prompt (must be at the end)
+# Starship prompt
 eval "$(starship init zsh)"
 
 # Transient prompt: once a command runs, its prompt collapses to "❯ command"
@@ -35,25 +62,3 @@ zle-line-init() {
 }
 zle -N zle-line-init
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-# Go
-export PATH=$PATH:/usr/local/go/bin
-
-# bun completions
-[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
-
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
-# Added by cua-driver-rs installer — see https://github.com/trycua/cua
-export PATH="$HOME/.local/bin:$PATH"
-
-# Java 21 (only if installed)
-if /usr/libexec/java_home -v 21 >/dev/null 2>&1; then
-  export JAVA_HOME=$(/usr/libexec/java_home -v 21)
-  export PATH="$JAVA_HOME/bin:$PATH"
-fi

@@ -39,18 +39,22 @@ vim.lsp.config("lua_ls", {
   },
 })
 
--- Add copy/paste over ssh
-vim.g.clipboard = {
-  name = 'OSC 52',
-  copy = {
-    ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-    ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
-  },
-  paste = {
-    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
-    ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
-  },
-}
+-- Clipboard: on macOS Neovim uses pbcopy/pbpaste by itself. Over SSH and in
+-- WSL there's no local clipboard tool, so copy through the terminal with
+-- OSC 52. WezTerm doesn't answer OSC 52 paste requests, so pasting uses
+-- Neovim's last yank instead of waiting for a reply that never comes
+-- (Cmd/Ctrl+V still pastes from the system clipboard)
+if vim.env.SSH_TTY or vim.fn.has("mac") == 0 then
+  local osc52 = require("vim.ui.clipboard.osc52")
+  local function paste()
+    return { vim.fn.split(vim.fn.getreg(""), "\n"), vim.fn.getregtype("") }
+  end
+  vim.g.clipboard = {
+    name = "OSC 52 (copy only)",
+    copy = { ["+"] = osc52.copy("+"), ["*"] = osc52.copy("*") },
+    paste = { ["+"] = paste, ["*"] = paste },
+  }
+end
 
 vim.opt.list = true
 vim.opt.listchars = { trail = "·", tab = "» ", nbsp = "␣" }

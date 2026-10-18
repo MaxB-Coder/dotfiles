@@ -1,20 +1,24 @@
 local M = {}
 
+-- Colours come from the shared palette (dotfiles/wezterm/palette.lua), so the
+-- editor matches the terminal exactly
+local p = require("palette")
+
 M.colors = {
-  bg          = "#2a2a2a",    -- matches Starship terminal bg
-  bg_dark     = "#222222",
-  bg_light    = "#333333",
-  cursor_line = "#333333",
-  fg          = "#e0e0e0",
-  fg_dim      = "#A8A8A8",    -- exact Starship grey
-  comment     = "#6b6b6b",
-  orange      = "#E07B39",
-  purple      = "#9B7EC8",
-  amber       = "#C8A97E",    -- exact Starship amber
-  red         = "#CC4A32",    -- exact Starship error red
-  green       = "#7DAF75",
-  selection   = "#2f2f2f",
-  border      = "#3a3a3a",
+  bg          = p.bg,
+  bg_dark     = p.bar,
+  bg_light    = p.bg1,
+  cursor_line = p.bg_soft,
+  fg          = p.fg,
+  fg_dim      = p.fg4,
+  comment     = p.muted,
+  orange      = p.accent,
+  purple      = p.purple,
+  amber       = p.yellow_dim,
+  red         = p.red,
+  green       = p.green,
+  selection   = p.bg2,
+  border      = p.bg1,
 }
 
 function M.setup()
@@ -85,9 +89,9 @@ function M.setup()
   hl(0, "@function.call",      { fg = c.amber })
   hl(0, "@method",             { fg = c.amber })
   hl(0, "@method.call",        { fg = c.amber })
-  hl(0, "@type",               { fg = "#9B7EC8", bold = true })
-  hl(0, "@type.builtin",       { fg = "#9B7EC8" })
-  hl(0, "@constructor",        { fg = "#9B7EC8" })
+  hl(0, "@type",               { fg = c.purple, bold = true })
+  hl(0, "@type.builtin",       { fg = c.purple })
+  hl(0, "@constructor",        { fg = c.purple })
   hl(0, "@parameter",          { fg = c.fg })
   hl(0, "@variable",           { fg = c.fg })
   hl(0, "@variable.builtin",   { fg = c.orange })
@@ -95,7 +99,7 @@ function M.setup()
   hl(0, "@constant.builtin",   { fg = c.orange })
   hl(0, "@property",           { fg = c.fg_dim })
   hl(0, "@field",              { fg = c.fg_dim })
-  hl(0, "@number",             { fg = "#9B7EC8" })
+  hl(0, "@number",             { fg = c.purple })
   hl(0, "@boolean",            { fg = c.orange, bold = true })
   hl(0, "@comment",            { fg = c.comment, italic = true })
   hl(0, "@tag",                { fg = c.orange })
@@ -116,12 +120,26 @@ function M.setup()
   hl(0, "GitSignsChange",  { fg = c.orange })
   hl(0, "GitSignsDelete",  { fg = c.red })
 
-  -- Telescope
-  hl(0, "TelescopeBorder",         { fg = c.border })
-  hl(0, "TelescopeNormal",         { fg = c.fg, bg = c.bg_dark })
-  hl(0, "TelescopeSelection",      { fg = c.fg, bg = c.selection })
-  hl(0, "TelescopeSelectionCaret", { fg = c.orange })
-  hl(0, "TelescopeMatching",       { fg = c.orange, bold = true })
+  -- Floating windows (picker, completion menu, docs, notifications)
+  hl(0, "FloatBorder",     { fg = c.border, bg = c.bg_dark })
+  hl(0, "FloatTitle",      { fg = c.orange, bg = c.bg_dark, bold = true })
+
+  -- snacks.nvim (dashboard, picker, notifier)
+  hl(0, "SnacksDashboardHeader", { link = "DashboardHeader" })
+  hl(0, "SnacksDashboardFooter", { link = "DashboardFooter" })
+  hl(0, "SnacksDashboardKey",    { fg = c.orange, bold = true })
+  hl(0, "SnacksDashboardIcon",   { fg = c.orange })
+  hl(0, "SnacksDashboardDesc",   { fg = c.fg })
+  hl(0, "SnacksPickerMatch",     { fg = c.orange, bold = true })
+  hl(0, "SnacksPickerPrompt",    { fg = c.orange })
+  hl(0, "SnacksPickerListCursorLine", { bg = c.selection })
+
+  -- blink.cmp (completion menu)
+  hl(0, "BlinkCmpMenu",          { fg = c.fg, bg = c.bg_dark })
+  hl(0, "BlinkCmpMenuBorder",    { link = "FloatBorder" })
+  hl(0, "BlinkCmpMenuSelection", { fg = c.bg, bg = c.orange })
+  hl(0, "BlinkCmpDocBorder",     { link = "FloatBorder" })
+  hl(0, "BlinkCmpLabelMatch",    { fg = c.orange, bold = true })
 
   -- NvimTree
   hl(0, "NvimTreeNormal",      { fg = c.fg, bg = c.bg_dark })

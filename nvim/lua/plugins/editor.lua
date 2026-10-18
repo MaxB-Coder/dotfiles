@@ -1,19 +1,5 @@
 return {
-  -- Fuzzy finder (find files, search text, and much more)
-  {
-    "nvim-telescope/telescope.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    cmd = "Telescope",
-    config = function()
-      require("telescope").setup()
-    end,
-    keys = {
-      { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find files" },
-      { "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Search in files" },
-      { "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Find buffers" },
-      { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Help tags" },
-    },
-  },
+  -- Fuzzy finding (files, text, buffers, help) is snacks.picker, see snacks.lua
 
   -- File tree
   {
@@ -36,14 +22,7 @@ return {
     end,
   },
 
-  -- Comment toggling
-  {
-    "numToStr/Comment.nvim",
-    event = "VeryLazy",
-    config = function()
-      require("Comment").setup()
-    end,
-  },
+  -- Comment toggling is built in since Neovim 0.10: gcc (line), gc (selection)
 
   -- Git signs in the gutter
   {

@@ -5,9 +5,10 @@ Personal development environment configuration for Mac and Windows (WSL).
 ## Stack
 
 - **Terminal:** WezTerm
-- **Shell:** zsh + Starship
-- **Editor:** Neovim
-- **Theme:** Custom Claude-inspired (charcoal + orange)
+- **Shell:** zsh + Starship (pill prompt), fzf, eza, bat, delta, zoxide
+- **Editor:** Neovim (snacks.nvim, blink.cmp, conform.nvim, Treesitter `main`)
+- **Runtimes:** mise (Node, Go), configured in `mise/config.toml`
+- **Theme:** Gruvbox dark with the Claude orange accent. One palette file, `wezterm/palette.lua`, is shared by WezTerm and Neovim; Starship and zsh repeat its hex values
 
 ---
 
@@ -30,12 +31,17 @@ Then open Neovim and run `:Lazy` to install plugins.
 
 ### What gets installed
 
-- Neovim with Lazy plugin manager
-- WezTerm with custom config
-- zsh with Starship prompt
-- zsh-autosuggestions and zsh-syntax-highlighting
-- ripgrep (for Telescope live grep)
-- JetBrains Mono font
+Everything in [`brew/Brewfile`](brew/Brewfile) (`brew bundle`), then the runtimes in `mise/config.toml`:
+
+- Neovim with Lazy plugin manager, plus tree-sitter CLI and ripgrep
+- WezTerm with custom config, JetBrains Mono font
+- zsh with Starship, zsh-autosuggestions and zsh-syntax-highlighting
+- fzf, eza, bat, git-delta, zoxide
+- mise, which installs Node and Go
+
+`brew/Brewfile.all` is a full snapshot of everything installed on the main Mac (`brew bundle dump`).
+
+Check a machine any time with `./doctor.sh`: tool versions, links, git and shell startup time.
 
 ### What gets symlinked
 
@@ -44,7 +50,10 @@ Then open Neovim and run `:Lazy` to install plugins.
 | Neovim | `~/.config/nvim` |
 | zsh | `~/.zshrc` |
 | Starship | `~/.config/starship.toml` |
-| WezTerm | `~/.config/wezterm/wezterm.lua` |
+| mise | `~/.config/mise/config.toml` |
+| WezTerm | `~/.config/wezterm/wezterm.lua` and `palette.lua` |
+
+`install.sh` also adds one include line to `~/.gitconfig` so git diffs go through delta (`git/delta.gitconfig`). Re-running it is safe: existing links are left alone and anything else is moved aside with a timestamp.
 
 ---
 
@@ -88,7 +97,10 @@ In Command Prompt run:
 ```cmd
 mkdir %USERPROFILE%\.config\wezterm
 curl -o %USERPROFILE%\.config\wezterm\wezterm.lua https://raw.githubusercontent.com/MaxB-Coder/dotfiles/main/wezterm/wezterm.lua
+curl -o %USERPROFILE%\.config\wezterm\palette.lua https://raw.githubusercontent.com/MaxB-Coder/dotfiles/main/wezterm/palette.lua
 ```
+
+Both files are needed: `wezterm.lua` loads the colours from `palette.lua` next to it. Run the same two commands again to update.
 
 The config automatically detects Windows and points WezTerm at WSL. Restart WezTerm — it should now open Ubuntu.
 
@@ -133,17 +145,9 @@ chmod +x install.sh
 ./install.sh
 ```
 
-### Step 8: Install NVM and Node
+### Step 8: Node and Go
 
-Mason requires Node for several language servers:
-```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-```
-
-Close and reopen WezTerm, then:
-```bash
-nvm install --lts
-```
+Nothing to do: `install.sh` installs mise, which installs Node and Go from `mise/config.toml` (Mason needs Node for several language servers). Check with `mise ls`.
 
 ### Step 9: Install additional dependencies
 ```bash
@@ -161,7 +165,8 @@ Lazy will automatically install all plugins on first launch including Treesitter
 ```bash
 echo $SHELL        # should return /bin/zsh
 echo $EDITOR       # should return nvim
-nvim               # should open with Claude theme and dashboard
+nvim               # should open with the dashboard
+./doctor.sh        # checks tools, versions, links and shell startup
 ```
 
 ### Notes
@@ -181,7 +186,7 @@ Open PowerShell and run `wsl --install -d Ubuntu`.
 Make sure JetBrains Mono is installed on Windows and set as the font in WezTerm.
 
 **Neovim plugins not installing:**
-Make sure Node is in PATH: `node --version`. If not found, install NVM and run `nvm install --lts`.
+Make sure Node is in PATH: `node --version`. If not found, run `mise install` (and `mise ls` to see what's installed).
 
 **Neovim plugins not installing (network):**
 Check internet inside WSL: `ping google.com`.
@@ -195,7 +200,7 @@ It should point to `~/dotfiles/zsh/.zshrc`.
 Open Neovim and run `:Mason` to check server status. Most issues resolve once Node and pip are installed.
 
 **Treesitter highlighting not working:**
-Make sure the plugin is using `branch = "master"` — the `main` branch has an incompatible API and does not include highlight queries.
+The config uses the `main` branch, which needs Neovim 0.12+, `tree-sitter-cli` 0.26.1+ and a C compiler (`install.sh` installs all three). Check with `nvim --version`, `tree-sitter --version`, then run `:TSUpdate`.
 
 ---
 
@@ -205,7 +210,8 @@ dotfiles/
 ├── nvim/
 │   ├── init.lua
 │   └── lua/
-│       ├── claude.lua          # custom Claude theme
+│       ├── claude.lua          # theme (colours from palette.lua)
+│       ├── palette.lua         # loads ../wezterm/palette.lua
 │       ├── config/
 │       │   ├── options.lua
 │       │   ├── keymaps.lua
@@ -215,17 +221,31 @@ dotfiles/
 │           ├── editor.lua
 │           ├── lsp.lua
 │           ├── treesitter.lua
-│           └── dashboard.lua
+│           ├── indent.lua
+│           ├── rainbow.lua
+│           └── snacks.lua      # dashboard, picker, notifications
 ├── zsh/
-│   ├── .zshrc
-│   ├── exports.zsh
+│   ├── .zshrc                  # history, completion, prompt
+│   ├── exports.zsh             # PATH, mise, Java, gcloud
 │   ├── aliases.zsh
-│   └── plugins.zsh
+│   ├── tools.zsh               # fzf, bat, zoxide
+│   └── plugins.zsh             # autosuggestions, syntax highlighting
 ├── starship/
 │   └── starship.toml
 ├── wezterm/
-│   └── wezterm.lua
+│   ├── wezterm.lua
+│   └── palette.lua             # shared colours (WezTerm + Neovim)
+├── mise/
+│   └── config.toml             # Node, Go versions
+├── git/
+│   └── delta.gitconfig
+├── brew/
+│   ├── Brewfile                # what install.sh installs on macOS
+│   └── Brewfile.all            # snapshot of everything installed
+├── icons/                      # app icon (svg, png, icns, ico)
+├── .stylua.toml                # Lua formatting style
 ├── install.sh
+├── doctor.sh
 └── README.md
 ```
 
@@ -253,6 +273,12 @@ Plugin updates in Neovim: `:Lazy update`
 | `Space + ff` | Find files |
 | `Space + fg` | Search in files |
 | `Space + fb` | Find buffers |
+| `Space + fr` | Recent files |
+| `Space + fh` | Help |
+| `Space + fn` | Notification history |
+| `Space + cf` | Format file (also runs on save; `:FormatToggle` turns that off) |
+| `gcc` / `gc` | Comment line / selection |
+| `Tab` / `Enter` | Next completion / accept |
 | `Space + e` | Toggle file tree |
 | `Space + w` | Save file |
 | `Space + q` | Quit |
@@ -267,8 +293,28 @@ Plugin updates in Neovim: `:Lazy update`
 | Key | Action |
 |-----|--------|
 | `CMD + T` | New tab |
-| `CMD + W` | Close tab |
+| `CMD + D` | Split pane right |
+| `CMD + SHIFT + D` | Split pane down |
+| `CMD + OPT + arrows` | Move between panes |
+| `CMD + CTRL + arrows` | Resize pane |
+| `CMD + SHIFT + Enter` | Zoom pane |
+| `CMD + W` | Close pane (and the tab with its last pane) |
 | `CMD + 1/2/3` | Switch tab |
-| `CMD + M` | Minimise |
+| `CMD + SHIFT + R` | Rename tab (empty name resets it) |
+| `CMD + SHIFT + P` | Command palette |
+| `CMD + M` | Hide WezTerm |
 | `CMD + Q` | Quit |
 | `CMD + Enter` | Toggle fullscreen |
+
+On Windows these use `CTRL + SHIFT` instead of `CMD` (`CTRL + SHIFT + T`, `CTRL + SHIFT + D`, ...); split down is `CTRL + SHIFT + ALT + D`, and panes move with `CTRL + SHIFT + arrows`.
+
+### Shell
+
+| Key | Action |
+|-----|--------|
+| `Ctrl + R` | Search command history (fzf) |
+| `Ctrl + T` | Find a file and insert its path, with preview |
+| `Alt + C` | Jump into a folder |
+| `z <name>` | Jump to a folder you've used before (zoxide) |
+| `ll` / `tree` | Long listing / tree with icons and git status (eza) |
+| `mise use node@22` | Pin a Node version for the current project |

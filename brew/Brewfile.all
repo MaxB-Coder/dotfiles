@@ -1,0 +1,70 @@
+tap "anomalyco/tap"
+tap "facebook/fb", trusted: true
+tap "mongodb/brew", trusted: true
+# Clone of cat(1) with syntax highlighting and Git integration
+brew "bat"
+# Cross-platform make
+brew "cmake"
+# Dependency manager for Cocoa projects
+brew "cocoapods"
+# GNU data recovery tool
+brew "ddrescue"
+# Modern, maintained replacement for ls
+brew "eza"
+# Banner-like program prints strings as ASCII art
+brew "figlet"
+# Command-line fuzzy finder written in Go
+brew "fzf"
+# GitHub command-line tool
+brew "gh"
+# Interpreter for PostScript and PDF
+brew "ghostscript"
+# Distributed revision control system
+brew "git"
+# Syntax-highlighting pager for git and diff output
+brew "git-delta"
+# Tools and libraries to manipulate images in select formats
+brew "imagemagick"
+# Library to render SVG files using Cairo
+brew "librsvg"
+# Java-based project management
+brew "maven"
+# Polyglot runtime manager (asdf rust clone)
+brew "mise"
+# MongoDB Shell to connect, configure, query, and work with your MongoDB database
+brew "mongosh"
+# Ambitious Vim-fork focused on extensibility and agility
+brew "neovim"
+# Package compiler and linker metadata toolkit
+brew "pkgconf"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.14"
+# Cross-shell prompt for astronauts
+brew "starship"
+# Parser generator tool
+brew "tree-sitter-cli"
+# Shell extension to navigate your filesystem faster
+brew "zoxide"
+# Fish-like fast/unobtrusive autosuggestions for zsh
+brew "zsh-autosuggestions"
+# Fish shell like syntax highlighting for zsh
+brew "zsh-syntax-highlighting"
+# The AI coding agent built for the terminal.
+brew "anomalyco/tap/opencode", trusted: true
+# Companion server for automating iOS Simulators
+brew "facebook/fb/idb-companion", trusted: true
+# High-performance, schema-free, document-oriented database
+brew "mongodb/brew/mongodb-community@7.0", trusted: true
+# Unified GUI for command-line AI agents
+cask "aionui"
+# Android SDK component
+cask "android-platform-tools"
+# OpenJDK distribution from Amazon
+cask "corretto@21"
+cask "font-jetbrains-mono"
+# Set of tools to manage resources and applications hosted on Google Cloud
+cask "gcloud-cli"
+# GPU-accelerated cross-platform terminal emulator and multiplexer
+cask "wezterm"
+uv "browser-use"
+uv "cowork-server"

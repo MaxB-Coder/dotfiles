@@ -5,9 +5,15 @@ alias v="nvim"
 alias ..="cd .."
 alias ...="cd ../.."
 
-# List files
-alias ls="ls --color=auto"
-alias ll="ls -la"
+# List files: eza (icons, git status, folders first) when installed
+if (( $+commands[eza] )); then
+  alias ls="eza --group-directories-first --icons=auto"
+  alias ll="eza -la --group-directories-first --icons=auto --git"
+  alias tree="eza --tree --icons=auto --git-ignore"
+else
+  alias ls="ls --color=auto"
+  alias ll="ls -la"
+fi
 
 # Git
 alias gs="git status"

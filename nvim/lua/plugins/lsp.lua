@@ -33,10 +33,10 @@ return {
     "neovim/nvim-lspconfig",
     dependencies = {
       "williamboman/mason-lspconfig.nvim",
-      "hrsh7th/cmp-nvim-lsp",
+      "saghen/blink.cmp",
     },
     config = function()
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
 
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(event)
@@ -62,7 +62,12 @@ return {
       for server, opts in pairs(servers) do
         opts.capabilities = capabilities
         vim.lsp.config(server, opts)
-        vim.lsp.enable(server)
+        -- Only start servers that are installed (Mason can't build gopls
+        -- until Go is installed, for example)
+        local cmd = vim.lsp.config[server].cmd
+        if type(cmd) ~= "table" or vim.fn.executable(cmd[1]) == 1 then
+          vim.lsp.enable(server)
+        end
       end
     end,
   },
@@ -82,7 +87,7 @@ return {
         root_dir = vim.fs.dirname(vim.fs.find({
           "gradlew", "mvnw", ".git", "pom.xml", "build.gradle"
         }, { upward = true })[1]),
-        capabilities = require("cmp_nvim_lsp").default_capabilities(),
+        capabilities = require("blink.cmp").get_lsp_capabilities(),
         settings = {
           java = {
             format = { enabled = true },
@@ -93,40 +98,94 @@ return {
     end,
   },
 
-  -- Completion engine
+  -- Completion: blink.cmp (faster than nvim-cmp, one plugin instead of five).
+  -- Same keys as before: Tab / S-Tab move, Enter accepts, C-Space opens,
+  -- C-e closes
   {
-    "hrsh7th/nvim-cmp",
-    dependencies = {
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-path",
-      "L3MON4D3/LuaSnip",
-      "saadparwaiz1/cmp_luasnip",
+    "saghen/blink.cmp",
+    version = "1.*", -- release builds ship a prebuilt fuzzy matcher
+    event = { "InsertEnter", "CmdlineEnter" },
+    opts = {
+      keymap = {
+        preset = "none",
+        ["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
+        ["<CR>"] = { "accept", "fallback" },
+        ["<Tab>"] = { "select_next", "fallback" },
+        ["<S-Tab>"] = { "select_prev", "fallback" },
+        ["<C-e>"] = { "hide", "fallback" },
+        ["<C-n>"] = { "select_next", "fallback" },
+        ["<C-p>"] = { "select_prev", "fallback" },
+        ["<C-u>"] = { "scroll_documentation_up", "fallback" },
+        ["<C-d>"] = { "scroll_documentation_down", "fallback" },
+      },
+      completion = {
+        list = { selection = { preselect = true, auto_insert = false } },
+        menu = { border = "rounded" },
+        documentation = { auto_show = true, auto_show_delay_ms = 250, window = { border = "rounded" } },
+      },
+      signature = { enabled = true, window = { border = "rounded" } },
+      sources = { default = { "lsp", "path", "snippets", "buffer" } },
+    },
+  },
+
+  -- Formatting: conform.nvim formats on save with the tools below (installed
+  -- by Mason). <leader>cf formats by hand, :FormatToggle turns saving off/on
+  {
+    "stevearc/conform.nvim",
+    event = "BufWritePre",
+    cmd = { "ConformInfo", "FormatToggle" },
+    keys = {
+      {
+        "<leader>cf",
+        function()
+          require("conform").format({ async = true, lsp_format = "fallback" })
+        end,
+        desc = "Format file",
+      },
     },
     config = function()
-      local cmp = require("cmp")
-      local luasnip = require("luasnip")
-
-      cmp.setup({
-        snippet = {
-          expand = function(args)
-            luasnip.lsp_expand(args.body)
-          end,
+      local prettier = { "prettier" }
+      require("conform").setup({
+        formatters_by_ft = {
+          lua = { "stylua" },
+          python = { "ruff_format" },
+          javascript = prettier,
+          typescript = prettier,
+          javascriptreact = prettier,
+          typescriptreact = prettier,
+          json = prettier,
+          yaml = prettier,
+          markdown = prettier,
+          css = prettier,
+          html = prettier,
+          sh = { "shfmt" },
+          bash = { "shfmt" },
+          go = { "gofmt" },
         },
-        mapping = cmp.mapping.preset.insert({
-          ["<C-Space>"] = cmp.mapping.complete(),
-          ["<CR>"] = cmp.mapping.confirm({ select = true }),
-          ["<Tab>"] = cmp.mapping.select_next_item(),
-          ["<S-Tab>"] = cmp.mapping.select_prev_item(),
-          ["<C-e>"] = cmp.mapping.abort(),
-        }),
-        sources = cmp.config.sources({
-          { name = "nvim_lsp" },
-          { name = "luasnip" },
-          { name = "buffer" },
-          { name = "path" },
-        }),
+        -- Only the formatters above run on save (no surprise LSP reformat)
+        format_on_save = function(bufnr)
+          if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+            return
+          end
+          return { timeout_ms = 1000, lsp_format = "never" }
+        end,
+        notify_no_formatters = false,
       })
+      vim.api.nvim_create_user_command("FormatToggle", function()
+        vim.g.disable_autoformat = not vim.g.disable_autoformat
+        vim.notify("Format on save " .. (vim.g.disable_autoformat and "off" or "on"))
+      end, { desc = "Turn format on save off or on" })
     end,
+  },
+
+  -- Installs the formatters conform uses (gofmt comes with Go via mise)
+  {
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    dependencies = { "williamboman/mason.nvim" },
+    event = "VeryLazy",
+    opts = {
+      ensure_installed = { "stylua", "prettier", "ruff", "shfmt" },
+      run_on_start = true,
+    },
   },
 }

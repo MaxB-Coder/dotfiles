@@ -1,0 +1,9 @@
+# Global runtimes, managed by mise (https://mise.jdx.dev) on every machine.
+# A project can pin its own with a .mise.toml, or an .nvmrc for Node
+[tools]
+node = "25"
+go = "latest"
+
+[settings]
+# Read .nvmrc / .node-version files, so old nvm projects keep working
+idiomatic_version_file_enable_tools = ["node"]
