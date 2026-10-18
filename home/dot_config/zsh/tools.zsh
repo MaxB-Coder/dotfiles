@@ -1,6 +1,6 @@
 # Modern CLI tools. Each one is only set up when it's installed, so a machine
 # without it still gets a working shell. Colours follow the shared palette
-# (dotfiles/wezterm/palette.lua)
+# (~/.config/wezterm/palette.lua)
 
 # bat: cat with syntax colours (Ubuntu names the binary batcat)
 if (( $+commands[batcat] && ! $+commands[bat] )); then

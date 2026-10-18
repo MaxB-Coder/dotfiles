@@ -1,0 +1,16 @@
+# Finder metadata
+.DS_Store
+**/.DS_Store
+
+{{ if eq .chezmoi.os "windows" -}}
+# Native Windows only gets the WezTerm config. The shell, Neovim and tools
+# live in WSL, which has its own clone of this repo and runs chezmoi there
+.zshrc
+.config/zsh
+.config/nvim
+.config/starship.toml
+.config/mise
+.config/git
+.config/.stylua.toml
+.chezmoiscripts/**
+{{- end }}

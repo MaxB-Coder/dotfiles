@@ -1,6 +1,6 @@
 local M = {}
 
--- Colours come from the shared palette (dotfiles/wezterm/palette.lua), so the
+-- Colours come from the shared palette (~/.config/wezterm/palette.lua), so the
 -- editor matches the terminal exactly
 local p = require("palette")
 

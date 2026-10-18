@@ -105,6 +105,20 @@ config.tab_bar_at_bottom = false
 config.hide_tab_bar_if_only_one_tab = false -- the bar holds the window buttons
 config.show_tabs_in_tab_bar = true
 config.show_new_tab_button_in_tab_bar = true
+-- Options from the patched WezTerm build (github.com/MaxB-Coder/wezterm fork,
+-- see FORK.md there): tabs fill the bar to the top edge, the close X shows
+-- only on the hovered tab, and the macOS traffic lights sit centred in the bar.
+-- Stock WezTerm (e.g. on Windows) rejects options it doesn't know, so each one
+-- is only set when the running build accepts it
+local function set_if_supported(key, value)
+  pcall(function()
+    config[key] = value
+  end)
+end
+set_if_supported("tab_bar_tabs_fill_height", true)
+set_if_supported("show_close_tab_button_on_hover", true)
+set_if_supported("macos_center_title_buttons_in_tab_bar", true)
+
 config.window_frame = {
   font = wezterm.font({ family = "JetBrains Mono", weight = "DemiBold" }),
   font_size = 11.0,

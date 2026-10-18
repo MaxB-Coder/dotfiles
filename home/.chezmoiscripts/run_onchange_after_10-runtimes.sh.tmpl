@@ -1,0 +1,14 @@
+#!/bin/bash
+# Install the runtimes listed in ~/.config/mise/config.toml. chezmoi re-runs
+# this whenever that file changes: {{ include "dot_config/mise/config.toml" | sha256sum }}
+set -e
+if ! command -v mise >/dev/null 2>&1; then
+  echo "mise not installed yet, skipping runtimes (run install.sh)"
+  exit 0
+fi
+# Reuse Node versions installed with nvm instead of downloading them again
+if [ -d "$HOME/.nvm/versions/node" ]; then
+  mise sync node --nvm
+fi
+mise install
+mise reshim

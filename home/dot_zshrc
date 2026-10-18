@@ -25,10 +25,10 @@ autoload -Uz compinit
 }
 
 # Load all zsh config files (mise, Bun, Java and PATH live in exports.zsh)
-source ~/dotfiles/zsh/exports.zsh
-source ~/dotfiles/zsh/aliases.zsh
-source ~/dotfiles/zsh/tools.zsh   # before plugins, so syntax highlighting sees fzf's widgets
-source ~/dotfiles/zsh/plugins.zsh
+source ~/.config/zsh/exports.zsh
+source ~/.config/zsh/aliases.zsh
+source ~/.config/zsh/tools.zsh   # before plugins, so syntax highlighting sees fzf's widgets
+source ~/.config/zsh/plugins.zsh
 
 # Starship prompt
 eval "$(starship init zsh)"

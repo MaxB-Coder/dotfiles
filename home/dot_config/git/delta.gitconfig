@@ -1,6 +1,6 @@
 # Git diffs through delta (https://github.com/dandavison/delta), in the shared
-# Gruvbox palette. Included from ~/.gitconfig by install.sh:
-#   git config --global include.path ~/dotfiles/git/delta.gitconfig
+# Gruvbox palette. Included from ~/.gitconfig by a chezmoi script:
+#   git config --global include.path ~/.config/git/delta.gitconfig
 [core]
 	pager = delta
 

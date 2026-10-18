@@ -6,7 +6,8 @@
 brew "git"
 brew "neovim"
 brew "starship"
-brew "mise"             # Node, Go and other runtimes (see mise/config.toml)
+brew "chezmoi"          # puts the configs in place (home/ in the repo)
+brew "mise"             # Node, Go and other runtimes (~/.config/mise/config.toml)
 brew "tree-sitter-cli"  # builds Neovim's Treesitter parsers
 brew "ripgrep"
 
@@ -19,6 +20,8 @@ brew "bat"
 brew "git-delta"
 brew "zoxide"
 
-# Apps and fonts
-cask "wezterm"
+# Apps and fonts. WezTerm isn't here: this setup uses the patched build from
+# ~/developer/wezterm (see FORK.md there; scripts/build-macos-app.sh). Stock
+# WezTerm (`brew install --cask wezterm`) also works with the config, it just
+# skips the patched-only options
 cask "font-jetbrains-mono"

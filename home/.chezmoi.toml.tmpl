@@ -1,0 +1,8 @@
+{{- /* Per-machine chezmoi settings, written to ~/.config/chezmoi/chezmoi.toml by `chezmoi init` */ -}}
+{{- if ne .chezmoi.os "windows" }}
+# The repo lives in ~/dotfiles (install.sh clones it there)
+sourceDir = "~/dotfiles"
+# Link each file back into the repo, so editing ~/.config/... edits ~/dotfiles
+# and Lazy's lockfile updates land in git
+mode = "symlink"
+{{- end }}

@@ -4,11 +4,12 @@ Personal development environment configuration for Mac and Windows (WSL).
 
 ## Stack
 
-- **Terminal:** WezTerm
+- **Terminal:** WezTerm, a patched build from [MaxB-Coder/wezterm](https://github.com/MaxB-Coder/wezterm) (full-height tabs, close X on hover, centred traffic lights). Stock WezTerm works too; it skips the patched-only options
+- **Configs:** [chezmoi](https://www.chezmoi.io). Everything under `home/` is linked into your home folder, so editing `~/.config/...` edits this repo
 - **Shell:** zsh + Starship (pill prompt), fzf, eza, bat, delta, zoxide
 - **Editor:** Neovim (snacks.nvim, blink.cmp, conform.nvim, Treesitter `main`)
-- **Runtimes:** mise (Node, Go), configured in `mise/config.toml`
-- **Theme:** Gruvbox dark with the Claude orange accent. One palette file, `wezterm/palette.lua`, is shared by WezTerm and Neovim; Starship and zsh repeat its hex values
+- **Runtimes:** mise (Node, Go), configured in `home/dot_config/mise/config.toml`
+- **Theme:** Gruvbox dark with the Claude orange accent. One palette file, `home/dot_config/wezterm/palette.lua`, is shared by WezTerm and Neovim; Starship and zsh repeat its hex values
 
 ---
 
@@ -31,29 +32,47 @@ Then open Neovim and run `:Lazy` to install plugins.
 
 ### What gets installed
 
-Everything in [`brew/Brewfile`](brew/Brewfile) (`brew bundle`), then the runtimes in `mise/config.toml`:
+Everything in [`brew/Brewfile`](brew/Brewfile) (`brew bundle`), then chezmoi puts the configs in place and installs the mise runtimes:
 
 - Neovim with Lazy plugin manager, plus tree-sitter CLI and ripgrep
-- WezTerm with custom config, JetBrains Mono font
+- JetBrains Mono font
 - zsh with Starship, zsh-autosuggestions and zsh-syntax-highlighting
 - fzf, eza, bat, git-delta, zoxide
-- mise, which installs Node and Go
+- chezmoi, and mise, which installs Node and Go
+
+WezTerm isn't in the Brewfile: install the patched build (in the fork, `scripts/build-macos-app.sh`, or a release from its CI), or `brew install --cask wezterm` for stock.
 
 `brew/Brewfile.all` is a full snapshot of everything installed on the main Mac (`brew bundle dump`).
 
-Check a machine any time with `./doctor.sh`: tool versions, links, git and shell startup time.
+Check a machine any time with `./doctor.sh`: tool versions, configs (`chezmoi verify`), git and shell startup time.
 
-### What gets symlinked
+### How configs get into place (chezmoi)
 
-| Config | Location |
+chezmoi reads `home/` (set by `.chezmoiroot`) and links each file into your home folder. File names follow chezmoi's naming: `dot_` becomes `.`.
+
+| In the repo | Linked to |
 |--------|----------|
-| Neovim | `~/.config/nvim` |
-| zsh | `~/.zshrc` |
-| Starship | `~/.config/starship.toml` |
-| mise | `~/.config/mise/config.toml` |
-| WezTerm | `~/.config/wezterm/wezterm.lua` and `palette.lua` |
+| `home/dot_zshrc` | `~/.zshrc` |
+| `home/dot_config/zsh/` | `~/.config/zsh/` (sourced by `.zshrc`) |
+| `home/dot_config/nvim/` | `~/.config/nvim/` |
+| `home/dot_config/starship.toml` | `~/.config/starship.toml` |
+| `home/dot_config/wezterm/` | `~/.config/wezterm/` (`wezterm.lua`, `palette.lua`) |
+| `home/dot_config/mise/config.toml` | `~/.config/mise/config.toml` |
+| `home/dot_config/git/delta.gitconfig` | `~/.config/git/delta.gitconfig` |
 
-`install.sh` also adds one include line to `~/.gitconfig` so git diffs go through delta (`git/delta.gitconfig`). Re-running it is safe: existing links are left alone and anything else is moved aside with a timestamp.
+On macOS and Linux every file is a symlink back into the repo (`mode = "symlink"` in `home/.chezmoi.toml.tmpl`), so you can edit either `~/.config/...` or `~/dotfiles/home/...` and Lazy's lockfile updates land in git. Native Windows gets plain copies of the WezTerm files only (`home/.chezmoiignore`).
+
+Day to day:
+
+```bash
+chezmoi add ~/.config/foo/config.toml   # start tracking a new file
+chezmoi status                          # anything out of sync?
+chezmoi apply                           # put everything in place again
+```
+
+Scripts in `home/.chezmoiscripts` run on apply: one installs the mise runtimes whenever the mise config changes, one adds the delta include to `~/.gitconfig`.
+
+Re-running `install.sh` is safe: chezmoi's links are left alone, links from the old (pre-chezmoi) layout are replaced, and any other file in the way is moved aside with a timestamp.
 
 ---
 
@@ -91,16 +110,15 @@ https://wezfurlong.org/wezterm/installation.html
 
 Choose the Windows installer (.exe).
 
-### Step 3: Pull WezTerm config from GitHub
+### Step 3: Get the WezTerm config with chezmoi
 
-In Command Prompt run:
-```cmd
-mkdir %USERPROFILE%\.config\wezterm
-curl -o %USERPROFILE%\.config\wezterm\wezterm.lua https://raw.githubusercontent.com/MaxB-Coder/dotfiles/main/wezterm/wezterm.lua
-curl -o %USERPROFILE%\.config\wezterm\palette.lua https://raw.githubusercontent.com/MaxB-Coder/dotfiles/main/wezterm/palette.lua
+In PowerShell run:
+```powershell
+winget install twpayne.chezmoi
+chezmoi init --apply MaxB-Coder/dotfiles
 ```
 
-Both files are needed: `wezterm.lua` loads the colours from `palette.lua` next to it. Run the same two commands again to update.
+On Windows chezmoi only installs the WezTerm config (`wezterm.lua` and `palette.lua` in `%USERPROFILE%\.config\wezterm`); the shell and Neovim live in WSL. To update later: `chezmoi update`.
 
 The config automatically detects Windows and points WezTerm at WSL. Restart WezTerm — it should now open Ubuntu.
 
@@ -147,7 +165,7 @@ chmod +x install.sh
 
 ### Step 8: Node and Go
 
-Nothing to do: `install.sh` installs mise, which installs Node and Go from `mise/config.toml` (Mason needs Node for several language servers). Check with `mise ls`.
+Nothing to do: `install.sh` installs mise, which installs Node and Go from `~/.config/mise/config.toml` (Mason needs Node for several language servers). Check with `mise ls`.
 
 ### Step 9: Install additional dependencies
 ```bash
@@ -171,11 +189,11 @@ nvim               # should open with the dashboard
 
 ### Notes
 
-- WezTerm config is shared between Mac and Windows via dotfiles. The `wezterm.lua` uses OS detection to automatically set the correct shell — no manual editing needed.
+- WezTerm config is shared between Mac and Windows through chezmoi. `wezterm.lua` uses OS detection to set the right shell and window buttons, and only turns on the patched-build options when the running WezTerm supports them.
 - `plugins.zsh` uses OS detection to source zsh plugins from the correct path on Mac (Homebrew) and Linux (apt).
 - Always clone and work inside the Linux filesystem (`~/`) not the Windows filesystem (`/mnt/c/...`) for best performance.
 - Windows gaming runs natively and is completely unaffected by WSL.
-- To update your dotfiles on either machine: `cd ~/dotfiles && git pull`
+- To update your dotfiles: `cd ~/dotfiles && git pull && chezmoi apply` (WSL, Mac) or `chezmoi update` (Windows).
 
 ### Troubleshooting
 
@@ -193,8 +211,8 @@ Check internet inside WSL: `ping google.com`.
 If this fails, restart WSL: run `wsl --shutdown` in PowerShell, then reopen WezTerm.
 
 **zsh not loading .zshrc:**
-Make sure the symlink exists: `ls -la ~/.zshrc`
-It should point to `~/dotfiles/zsh/.zshrc`.
+Run `chezmoi verify` (silent when everything is in place) or `chezmoi status`, then `chezmoi apply`.
+`~/.zshrc` should link to `~/dotfiles/home/dot_zshrc`.
 
 **Language servers not working:**
 Open Neovim and run `:Mason` to check server status. Most issues resolve once Node and pip are installed.
@@ -207,45 +225,36 @@ The config uses the `main` branch, which needs Neovim 0.12+, `tree-sitter-cli` 0
 ## Structure
 ```
 dotfiles/
-├── nvim/
-│   ├── init.lua
-│   └── lua/
-│       ├── claude.lua          # theme (colours from palette.lua)
-│       ├── palette.lua         # loads ../wezterm/palette.lua
-│       ├── config/
-│       │   ├── options.lua
-│       │   ├── keymaps.lua
-│       │   └── lazy.lua
-│       └── plugins/
-│           ├── ui.lua
-│           ├── editor.lua
-│           ├── lsp.lua
-│           ├── treesitter.lua
-│           ├── indent.lua
-│           ├── rainbow.lua
-│           └── snacks.lua      # dashboard, picker, notifications
-├── zsh/
-│   ├── .zshrc                  # history, completion, prompt
-│   ├── exports.zsh             # PATH, mise, Java, gcloud
-│   ├── aliases.zsh
-│   ├── tools.zsh               # fzf, bat, zoxide
-│   └── plugins.zsh             # autosuggestions, syntax highlighting
-├── starship/
-│   └── starship.toml
-├── wezterm/
-│   ├── wezterm.lua
-│   └── palette.lua             # shared colours (WezTerm + Neovim)
-├── mise/
-│   └── config.toml             # Node, Go versions
-├── git/
-│   └── delta.gitconfig
+├── .chezmoiroot                # tells chezmoi the configs are in home/
+├── home/                       # everything chezmoi puts in ~
+│   ├── .chezmoi.toml.tmpl      # per-machine chezmoi settings (symlink mode)
+│   ├── .chezmoiignore          # what each OS skips (Windows: all but WezTerm)
+│   ├── .chezmoiscripts/        # mise runtimes, git delta include
+│   ├── dot_zshrc               # history, completion, prompt
+│   └── dot_config/
+│       ├── zsh/                # exports, aliases, tools (fzf, bat, zoxide), plugins
+│       ├── nvim/
+│       │   ├── init.lua
+│       │   ├── lazy-lock.json
+│       │   └── lua/
+│       │       ├── claude.lua      # theme (colours from palette.lua)
+│       │       ├── palette.lua     # loads ~/.config/wezterm/palette.lua
+│       │       ├── config/         # options, keymaps, lazy
+│       │       └── plugins/        # ui, editor, lsp, treesitter, snacks, indent, rainbow
+│       ├── wezterm/
+│       │   ├── wezterm.lua
+│       │   └── palette.lua         # shared colours (WezTerm + Neovim)
+│       ├── starship.toml
+│       ├── mise/config.toml        # Node, Go versions
+│       ├── git/delta.gitconfig
+│       └── dot_stylua.toml         # Lua formatting style for ~/.config
 ├── brew/
 │   ├── Brewfile                # what install.sh installs on macOS
 │   └── Brewfile.all            # snapshot of everything installed
 ├── icons/                      # app icon (svg, png, icns, ico)
-├── .stylua.toml                # Lua formatting style
-├── install.sh
-├── doctor.sh
+├── .stylua.toml                # Lua formatting style inside the repo
+├── install.sh                  # packages, then chezmoi
+├── doctor.sh                   # checks the setup
 └── README.md
 ```
 
@@ -253,11 +262,14 @@ dotfiles/
 
 ## Updating
 
-On any machine, pull the latest changes:
+On macOS and WSL, pull the latest changes and put them in place:
 ```bash
 cd ~/dotfiles
 git pull
+chezmoi apply
 ```
+
+On Windows (WezTerm config only): `chezmoi update`.
 
 Plugin updates in Neovim: `:Lazy update`
 

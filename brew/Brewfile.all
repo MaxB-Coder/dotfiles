@@ -64,7 +64,5 @@ cask "corretto@21"
 cask "font-jetbrains-mono"
 # Set of tools to manage resources and applications hosted on Google Cloud
 cask "gcloud-cli"
-# GPU-accelerated cross-platform terminal emulator and multiplexer
-cask "wezterm"
 uv "browser-use"
 uv "cowork-server"

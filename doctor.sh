@@ -26,15 +26,6 @@ tool() { # name, command, version command, minimum version (optional)
   fi
 }
 
-linked() { # source in dotfiles, link path
-  if [ -L "$2" ] && [ "$(readlink "$2")" = "$1" ]; then
-    ok "${2/#$HOME/~}"
-  elif [ -e "$2" ]; then
-    warn "${2/#$HOME/~} exists but isn't linked to dotfiles"
-  else
-    warn "${2/#$HOME/~} missing"
-  fi
-}
 
 # Runtimes come from mise; use its shims so this works outside zsh too
 [ -d "$HOME/.local/share/mise/shims" ] && PATH="$HOME/.local/share/mise/shims:$PATH"
@@ -50,6 +41,7 @@ tool "zsh" zsh "zsh --version"
 tool "Neovim" nvim "nvim --version" "0.12.0"
 tool "Starship" starship "starship --version"
 tool "mise" mise "mise --version"
+tool "chezmoi" chezmoi "chezmoi --version"
 tool "tree-sitter CLI" tree-sitter "tree-sitter --version" "0.26.1"
 tool "ripgrep" rg "rg --version"
 [ "$OS" = "mac" ] && tool "WezTerm" wezterm "wezterm --version"
@@ -65,18 +57,18 @@ if command -v bat &>/dev/null; then tool "bat" bat "bat --version"; else tool "b
 tool "delta" delta "delta --version"
 tool "zoxide" zoxide "zoxide --version"
 
-section "Links"
-linked "$DOTFILES/zsh/.zshrc" "$HOME/.zshrc"
-linked "$DOTFILES/nvim" "$HOME/.config/nvim"
-linked "$DOTFILES/starship/starship.toml" "$HOME/.config/starship.toml"
-linked "$DOTFILES/mise/config.toml" "$HOME/.config/mise/config.toml"
-if [ "$OS" = "mac" ]; then
-  linked "$DOTFILES/wezterm/wezterm.lua" "$HOME/.config/wezterm/wezterm.lua"
-  linked "$DOTFILES/wezterm/palette.lua" "$HOME/.config/wezterm/palette.lua"
+section "Configs (chezmoi)"
+if ! command -v chezmoi &>/dev/null; then
+  warn "chezmoi missing, so configs can't be checked"
+elif chezmoi verify --exclude=scripts &>/dev/null; then
+  ok "all $(chezmoi managed --exclude=dirs,scripts | wc -l | tr -d ' ') configs in place (chezmoi verify)"
+else
+  warn "some configs differ from the repo (run: chezmoi status, then chezmoi apply)"
+  chezmoi status --exclude=scripts | sed 's/^/          /'
 fi
 
 section "Git"
-if git config --global --get-all include.path | grep -q "dotfiles/git/delta.gitconfig"; then
+if git config --global --get-all include.path | grep -qxF "~/.config/git/delta.gitconfig"; then
   ok "diffs use delta"
 else
   warn "delta include missing from ~/.gitconfig"
