@@ -34,7 +34,10 @@ source ~/.config/zsh/plugins.zsh
 eval "$(starship init zsh)"
 
 # Transient prompt: once a command runs, its prompt collapses to "❯ command"
-# so scrollback stays clean and only the live prompt shows the pills
+# so scrollback stays clean and only the live prompt shows the pills.
+# Skipped when Kiln draws its own prompt (KILN_PROMPT=kiln): Kiln already shows
+# each command as a block, and rewriting the prompt there recolours its ❯
+if [[ "$KILN_PROMPT" != kiln ]]; then
 zle-line-init() {
   emulate -L zsh
   [[ $CONTEXT == start ]] || return 0
@@ -61,4 +64,5 @@ zle-line-init() {
   return ret
 }
 zle -N zle-line-init
+fi
 
